@@ -1,14 +1,12 @@
 <template>
-    <div class="login_module">
-
+    <div id="health">
+        health
     </div>
 </template>
 
 <script>
 export default {
-    data () {
-
-    }
+    
 }
 </script>
 
