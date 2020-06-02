@@ -21,18 +21,39 @@
                 <p class="re_user">作者</p>
               </div>
             </li>
+            <!-- <li class="re_item" v-for="item in allRecipe" :key="item">
+              <div class="re_img">
+                <img :src="'data:image/*;base64,'+item.finishImg" alt="error">
+              </div>
+              <div class="re_autor">
+                <p class="re_name">{{item.title}}</p>
+                <p class="re_user"></p>
+              </div>
+            </li> -->
           </ul>
         </div>
       </div>
 </template>
 
 <script>
+import { mapState,mapGetters,mapMutations,mapActions } from 'vuex'
+
 export default {
     name: 'MyRecipe',
     data () {
         return {
             searchText: ''
         }
+    },
+    created() {
+      this.findAllRecipeHandler()
+    },
+    computed: {
+      ...mapState('recipe',['allRecipe'])
+    },
+    methods: {
+      ...mapActions('recipe',['findAllRecipeHandler']),
+
     }
 }
 </script>

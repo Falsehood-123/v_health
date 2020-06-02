@@ -1,5 +1,6 @@
 import axios from 'axios'
 import qs from 'qs'
+import { setUserId,setUserName,getUserId,getUserName,deleteUserId,deleteUserName } from '../../localStorage/index.js'
 
 export default {
     namespaced: true,
@@ -50,6 +51,10 @@ export default {
                 data:payload,
                 method:'POST'
             })
+            let userId = res.data._id
+            let userName = res.data.username
+            setUserId(userId)
+            setUserName(userName)
             context.commit('getUserData',res.data)
             return response
         },
@@ -60,6 +65,10 @@ export default {
                 data: payload,
                 method: 'POST'
             })
+            let userName = response.data.username
+            let userId = response.data._id
+            setUserId(userId)
+            setUserName(userName)
             context.commit('getUserData',response.data)
             return response
         },
@@ -70,7 +79,20 @@ export default {
                 method:'GET',
                 params:{id:payload}
             })
+            deleteUserId()
+            deleteUserName()
             context.commit('userLogout')
+            return res
+        },
+        // 每次刷新页面进行登录验证
+        async checkHandler(context,payload) {
+            let res = await axios({
+                url:'/check',
+                method: 'POST',
+                baseURL:'http://localhost:3000',
+                data: payload
+            })
+            context.commit('getUserData',res.data)
             return res
         }
     }

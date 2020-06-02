@@ -15,7 +15,7 @@
       <!-- 导航栏 -->
       <div class="nav_base">
         <div class="logo_base">
-
+          <img src="../../public/images/logo.png" alt="error" class="logo_img">
         </div>
         <div class="search">
           <el-input placeholder="请输入内容" v-model="searchText" class="input-with-select">
@@ -93,8 +93,13 @@ export default {
 .logo_base {
   width: 30%;
   height: 80px;
-  background-color: lightblue;
   float: left;
+  line-height: 80px;
+}
+.logo_img {
+  width: 200px;
+  height: 60px;
+  display: inline-block;
 }
 .search {
   width: 30%;

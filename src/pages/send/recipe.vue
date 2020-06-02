@@ -19,11 +19,13 @@
                 <!-- 成品图 -->
                 <div class="finish">
                     <span>成品图</span>
-                    <div class="finesh_img">
+                    <div class="finish_item">
                         <el-upload
-                        action="http://localhost:3000/public/recipe"
-                        class="upload-demo">
-                        <el-button size="small" type="success">点击上传</el-button>
+                        action="http://localhost:3000/send/recipe/img"
+                        :show-file-list="false"
+                        :on-change="finishImgHandler">
+                        <img v-if="recipeData.finishImg" :src="'data:image/*;base64,'+recipeData.finishImg" class="finish_img">
+                        <i v-else class="el-icon-plus avatar-uploader-icon"></i>
                         </el-upload>
                     </div>
                 </div>
@@ -52,10 +54,12 @@
                             <li class="detail_item" v-for="(item,index) in recipeData.step" :key="index">
                                 <div class="de_left">
                                     <el-upload
-                                    action="http://localhost:3000/public/recipe"
-                                    :show-file-list="false">
-                                    <img v-if="item.imageUrl" :src="item.imageUrl" class="avatar">
-                                    <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+                                    class="avatar-uploader"
+                                    action="http://localhost:3000/send/recipe/img"
+                                    :show-file-list="false"
+                                    :on-change="recipeImg">
+                                    <img class="step_img" v-if="item.imageBase" :src="'data:image/*;base64,'+item.imageBase" @click="setIndex(index)">
+                                    <i v-else class="el-icon-plus avatar-uploader-icon" @click="setIndex(index)"></i>
                                     </el-upload>
                                 </div>
                                 <div class="de_right">
@@ -92,13 +96,19 @@
 
 <script>
 import { mapState,mapGetters,mapMutations,mapActions } from 'vuex'
+import { setUserId,getUserId,getUserName,deleteUserId } from '../../localStorage/index.js'
 
 export default {
     data () {
         return {
             recipeData: {
-                step:[{imageUrl:'',des:''}]
-            }
+                step:[{imageBase:'',des:''}],
+                userId: getUserId(),
+                finishImg: '',
+                userName: getUserName()
+            },
+            show_img: 'show_img',
+            index:0
         }
     },
     methods: {
@@ -118,15 +128,84 @@ export default {
         },
         // 添加步骤
         addStepHandler() {
-            this.recipeData.step.push({imageUrl:'',des:''})
+            this.recipeData.step.push({imageBase:'',des:''})
         },
         // 提交菜谱
         submitHandler() {
+            console.log(this.recipeData)
             this.sendRecipeHandler(this.recipeData)
             .then((res) => {
                 // 将步骤的值恢复原值
-                this.recipeData.step = [{imageUrl:'',des:''}]
+                // this.recipeData.step = [{imageBase:'',des:''}]
             })
+        },
+        setIndex(index) {
+            this.index = index
+        },
+        // 上传图片将之转换成base64
+        recipeImg(file){
+            let files = file.raw
+            let name = files.name
+            let arr = name.split('.')
+            let fileSize = 0;
+            let fileMaxSize = 10240;//1M
+            if(files){
+                fileSize =files.size;          
+                if (fileSize > 10*1024*1024) {
+                    alert("文件大小不能大于10M！");
+                    file.value = "";
+                    return false;
+                }else if (fileSize <= 0) {
+                    alert("文件大小不能为0M！");
+                    file.value = "";
+                    return false;
+                }
+            }else{
+                return false;
+            }
+	        //转码base64
+            let reader = new FileReader();
+            let imgFile
+            let that = this
+            reader.readAsDataURL(files)
+            reader.onload = e => {
+                imgFile = e.target.result;
+                let arr = imgFile.split(',')
+                this.recipeData.step[this.index].imageBase = arr[1]
+                this.show_img = 'show_img'
+            }
+        },
+        // 发布成品图
+        finishImgHandler(file) {
+            let files = file.raw
+            let name = files.name
+            let arr = name.split('.')
+            let fileSize = 0;
+            let fileMaxSize = 10240;//1M
+            if(files){
+                fileSize =files.size;          
+                if (fileSize > 10*1024*1024) {
+                    alert("文件大小不能大于10M！");
+                    file.value = "";
+                    return false;
+                }else if (fileSize <= 0) {
+                    alert("文件大小不能为0M！");
+                    file.value = "";
+                    return false;
+                }
+            }else{
+                return false;
+            }
+	        //转码base64
+            let reader = new FileReader();
+            let imgFile
+            let that = this
+            reader.readAsDataURL(files)
+            reader.onload = e => {
+                imgFile = e.target.result;
+                let arr = imgFile.split(',')
+                this.recipeData.finishImg = arr[1]
+            }
         }
     }
 }
@@ -180,6 +259,7 @@ export default {
 }
 .de_left {
     width: 200px;
+    height: 200px;
     line-height: 200px;
     box-sizing: border-box;
     border: 1px dashed gray;
@@ -188,6 +268,12 @@ export default {
     top: 0;
     left: 0;
     background-color: #fff;
+    overflow: hidden;
+}
+.step_img {
+    width: 200px;
+    height: 200px;
+    display: inline-block;
 }
 .de_right {
     width: 390px;
@@ -195,6 +281,20 @@ export default {
     position: absolute;
     top: 0;
     right: 0;
+}
+.finish_item {
+    width: 200px;
+    height: 200px;
+    box-sizing: border-box;
+    border: 1px dashed gray;
+    text-align: center;
+    line-height: 200px;
+    background-color: #ffffff;
+}
+.finish_img {
+    display: inline-block;
+    width: 200px;
+    height: 200px;
 }
 .step_del {
     position: absolute;

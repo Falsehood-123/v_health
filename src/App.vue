@@ -4,7 +4,7 @@
       <!-- 登录栏 -->
       <div class="top">
         <div class="logo">
-          
+          <img class="logo_img" src="../public/images/logo.png" alt="error">
         </div>
         <div class="nav">
           <el-tabs v-model="active" @tab-click="tabChangeHandler">
@@ -43,11 +43,18 @@
 
 <script>
 import { mapState,mapGetters,mapMutations,mapActions } from 'vuex'
+import { setUserId,getUserId,deleteUserId } from './localStorage/index.js'
 
 export default {
   data () {
     return {
-      active: '/'
+      active: '/',
+      id: {id:getUserId()}
+    }
+  },
+  mounted() {
+    if(getUserId()) {
+      this.checkHandler(this.id)
     }
   },
   computed: {
@@ -55,7 +62,7 @@ export default {
   },
   methods: {
     ...mapMutations('login',['showLoginDialog','showRegisterDialog']),
-    ...mapActions('login',['logoutHandler']),
+    ...mapActions('login',['logoutHandler','checkHandler']),
 
     tabChangeHandler(path) {
       this.$router.push({path:path.name})
@@ -103,8 +110,12 @@ export default {
 .logo {
   width: 30%;
   height: 40px;
-  background-color: lightblue;
   float: left;
+}
+.logo_img {
+  display: inline-block;
+  width: 200px;
+  height: 40px;
 }
 .nav {
   width: 50%;

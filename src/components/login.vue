@@ -66,6 +66,7 @@ export default {
                         type: 'success'
                     })
                 }
+                this.userData = {phone:'',password:''}
                 this.closeLoginDialog()
             })
         }
